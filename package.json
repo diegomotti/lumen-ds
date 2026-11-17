@@ -1,0 +1,20 @@
+{
+    "name": "lumen-ds",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --minify",
+        "watch:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch",
+        "start": "node server.js",
+        "dev": "concurrently --kill-others-on-fail \"npm:start\" \"npm:watch:css\""
+    },
+    "devDependencies": {
+        "@tailwindcss/cli": "latest",
+        "concurrently": "latest",
+        "tailwindcss": "latest"
+    },
+    "allowScripts": {
+        "@parcel/watcher@2.5.1": true
+    }
+}

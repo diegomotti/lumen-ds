@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Lumen DS - documentacao de fundacoes." />
+        <title>Lumen DS | Cores</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/styles.css" />
+    </head>
+    <body class="bg-white text-gray antialiased" data-page="colors">
+        <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-3" href="#conteudo">Pular para o conteudo</a>
+
+        <div data-component="header"></div>
+
+        <div class="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
+            <div data-component="sidebar"></div>
+
+            <main id="conteudo" class="min-w-0 bg-white">
+                <section id="title" class="border-b border-black/15 bg-secondary-50">
+                    <div class="flex max-w-360 mx-auto py-15 px-5 lg:px-10">
+                        <div class="w-1/2">
+                            <p class="text-xs font-medium tracking-widest text-black/50">LUMEN DS / RECURSOS</p>
+                            <h1 class="text-8xl font-instrument font-medium text-black tracking-tighter">Cores</h1>
+                        </div>
+                        <div class="w-1/2 flex justify-end items-center">
+                            <div class="flex bg-white/85 border border-black/15 focus-within:border-black focus-within:bg-white transition duration-500 rounded-xl px-4 py-4 md:w-95 items-center">
+                                <input class="min-w-0 flex-1 bg-transparent px-3 text-sm text-black outline-none placeholder:text-black/50" id="color-search" type="search" placeholder="Buscar token" autocomplete="on" />
+                                <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mx-auto max-w-360 px-5 py-16 lg:px-10" id="cores">
+                    <div class="grid gap-16" id="color-groups" aria-live="polite"></div>
+                </section>
+
+                <section class="border-t border-black/15 bg-white" id="em-breve">
+                    <div class="mx-auto grid max-w-360 gap-8 px-5 py-16 lg:grid-cols-[1fr_2fr] lg:px-10 lg:py-22">
+                        <p class="text-xs font-medium tracking-widest text-black/50">PROXIMAMENTE</p>
+                        <div>
+                            <h2 class="max-w-150 text-3xl font-medium leading-tight tracking-[-0.025em] sm:text-4xl">A mesma base vai receber tipografia, espacamento, componentes e orientacoes de uso.</h2>
+                            <p class="mt-6 max-w-125 text-base leading-7 text-black/60">O Lumen DS sera documentado como um sistema vivo: simples de consultar, consistente para implementar.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div data-component="footer"></div>
+
+        <div class="fixed bottom-6 right-6 hidden bg-[#121820] px-4 py-3 text-sm text-white shadow-xl" id="toast" role="status" aria-live="polite"></div>
+        <script src="/app.js"></script>
+    </body>
+</html>

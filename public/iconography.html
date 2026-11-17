@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Lumen DS - biblioteca de iconografia." data-i18n-attr="content:iconography.lumen-ds-biblioteca-de" />
+        <title data-i18n="iconography.lumen-ds-iconografia">Lumen DS | Iconografia</title>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Lumen DS" />
+        <meta property="og:title" content="Lumen Design System" />
+        <meta property="og:description" content="Lumen DS - documentação do design system." />
+        <meta property="og:image" content="/favicon.png" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:image" content="/favicon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="/styles.css" />
+    </head>
+    <body class="bg-white antialiased" data-page="iconography">
+        <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-3" href="#conteudo" data-i18n="common.pular-para-o-conteudo">Pular para o conteudo</a>
+
+        <div data-component="header"></div>
+
+        <div class="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
+            <div data-component="sidebar"></div>
+
+            <main id="conteudo" class="min-w-0 bg-white">
+                <section id="title" class="border-b border-black/15 bg-secondary-50">
+                    <div class="flex max-w-360 mx-auto py-15 px-5 lg:px-6">
+                        <div class="w-1/2">
+                            <p class="text-xs font-medium tracking-widest text-black/50" data-i18n="common.lumen-ds-recursos">LUMEN DS / RECURSOS</p>
+                            <h1 class="text-8xl font-medium text-black tracking-tighter" data-i18n="common.iconografia">Iconografia</h1>
+                        </div>
+                        <div class="w-1/2 flex justify-end items-center">
+                            <div class="flex bg-white/85 border border-black/15 focus-within:border-black focus-within:bg-white transition duration-500 rounded-xl px-4 py-4 md:w-95 items-center">
+                                <input class="min-w-0 flex-1 bg-transparent px-3 text-sm text-black outline-none placeholder:text-black/50" id="icon-search" type="search" placeholder="Buscar ícone" autocomplete="on" data-i18n-attr="placeholder:iconography.buscar-icone" />
+                                <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mx-auto max-w-360 px-5 py-14 lg:px-10 lg:py-20" aria-labelledby="catalogo-title">
+                    <div class="flex justify-between">
+                        <div>
+                            <p class="text-xs font-medium tracking-widest text-black/50" data-i18n="common.biblioteca">BIBLIOTECA</p>
+                            <h2 id="catalogo-title" class="mt-2 text-4xl font-medium tracking-tight text-black" data-i18n="iconography.icones">Ícones</h2>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex gap-2 overflow-x-auto border-b border-black/15 pb-4" aria-label="Filtros de ícones" id="icon-facets" role="tablist" data-i18n-attr="aria-label:iconography.filtros-de-icones"></div>
+                    <p class="mt-5 font-mono text-xs text-black/50" id="icon-result-label" aria-live="polite"></p>
+                    <div class="mt-6 grid gap-6 lg:grid-cols-[20%_minmax(0,1fr)] lg:items-start">
+                        <nav class="border border-black/15 bg-white lg:sticky lg:top-6 rounded-xl" aria-label="Valores do filtro selecionado" id="icon-facet-options" data-i18n-attr="aria-label:iconography.valores-do-filtro-selecionado"></nav>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6" id="figma-icon-grid"></div>
+                    </div>
+                </section>
+
+                <section class="border-t border-black/15 bg-secondary-50" aria-labelledby="usage-title">
+                    <div class="mx-auto max-w-360 px-5 py-14 lg:px-10 lg:py-20">
+                        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+                            <div>
+                                <p class="text-xs font-medium tracking-widest text-black/50" data-i18n="iconography.orientacoes">ORIENTAÇÕES</p>
+                                <h2 id="usage-title" class="mt-2 text-4xl font-medium tracking-tight text-black" data-i18n="iconography.uso-consistente">Uso consistente</h2>
+                            </div>
+                            <p class="text-sm leading-normal text-black/55" data-i18n="iconography.mantenha-o-traco-o">Mantenha o traço, o tamanho e o significado visual consistentes em cada fluxo.</p>
+                        </div>
+                        <div class="mt-10 grid gap-px border border-black/15 bg-black/15 lg:grid-cols-3">
+                            <article class="bg-secondary-50 p-6 lg:p-8">
+                                <h3 class="mt-8 text-xl font-medium text-black" data-i18n="iconography.tamanho">Tamanho</h3>
+                                <p class="mt-3 text-sm leading-normal text-black/55" data-i18n="iconography.use-16-px-em">Use 16 px em campos densos, 20 px em controles e 24 px em ações de destaque.</p>
+                            </article>
+                            <article class="bg-secondary-50 p-6 lg:p-8">
+                                <h3 class="mt-8 text-xl font-medium text-black" data-i18n="iconography.contraste">Contraste</h3>
+                                <p class="mt-3 text-sm leading-normal text-black/55" data-i18n="iconography.o-icone-herda-a">O ícone herda a cor do contexto. Reserve as cores semânticas para estados e feedback.</p>
+                            </article>
+                            <article class="bg-secondary-50 p-6 lg:p-8">
+                                <h3 class="mt-8 text-xl font-medium text-black" data-i18n="iconography.acao">Ação</h3>
+                                <p class="mt-3 text-sm leading-normal text-black/55" data-i18n="iconography.em-acoes-pouco-familiares">Em ações pouco familiares, use um rótulo para que o significado não dependa apenas do símbolo.</p>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div data-component="footer"></div>
+        <div class="fixed bottom-6 right-6 hidden bg-primary-800 px-4 py-3 text-lg text-white shadow-xl rounded-2xl" id="toast" role="status" aria-live="polite"></div>
+        <script src="/i18n.js"></script>
+        <script src="/app.js"></script>
+    </body>
+</html>
