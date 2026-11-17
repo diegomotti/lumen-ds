@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
 
 const publicDirectory = join(process.cwd(), "public");
-const colorsFile = join(process.cwd(), "lumen-ds", "colors.json");
+const colorsFile = join(process.cwd(), "resources", "colors.json");
 const iconsDirectory = join(publicDirectory, "assets", "icons");
 const liveReloadClients = new Set();
 const mimeTypes = {

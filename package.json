@@ -15,6 +15,6 @@
         "tailwindcss": "latest"
     },
     "allowScripts": {
-        "@parcel/watcher@2.5.1": true
+        "@parcel/watcher@2.6.0": true
     }
 }
