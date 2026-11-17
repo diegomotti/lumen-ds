@@ -3,6 +3,9 @@ let toastTimeout;
 let figmaIcons = [];
 let updatesData = [];
 let activeIconFacet = "type";
+let colorCollections = {};
+let activeColorCategory = "Palette";
+let activeColorMode = "";
 const buttonSelection = { color: "primary", shape: "slightlyRounded", style: "filled" };
 const buttonVariantDefinitions = [
     "primary|none|icon|default|false", "red|slightlyRounded|text|default|false", "primary|none|text|default|false", "primary|none|icon|active|false",
@@ -36,8 +39,73 @@ function familyFrom(name) {
     return name.match(/^([a-z]+)/i)?.[1] ?? "Outros";
 }
 
+function colorTokensFrom(data, prefix = "") {
+    if (!data || typeof data !== "object") return [];
+    return Object.entries(data).flatMap(([name, value]) => {
+        const path = prefix ? `${prefix}.${name}` : name;
+        if (value && typeof value === "object" && "$type" in value && "$value" in value) {
+            return [{ name: path, type: value.$type, value: value.$value }];
+        }
+        return colorTokensFrom(value, path);
+    });
+}
+
+function colorGroupFrom(name, category) {
+    if (category === "Palette") return familyFrom(name);
+    const parts = name.split(".");
+    if (parts.length >= 3) return parts.slice(0, 2).join(".");
+    if (parts.length === 2) return parts[0];
+    return name.match(/^[a-z]+/i)?.[0] ?? "Outros";
+}
+
+function colorGroupLabel(group, category) {
+    if (category === "Palette") return group;
+    return group
+        .split(/[.-]/)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" / ");
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;",
+    })[character]);
+}
+
 function formatValue(value) {
-    return value.startsWith("#") ? value.toUpperCase() : value;
+    const text = String(value);
+    return text.startsWith("#") ? text.toUpperCase() : text;
+}
+
+function colorReferenceValues() {
+    const values = new Map();
+    for (const modes of Object.values(colorCollections)) {
+        for (const modeData of Object.values(modes)) {
+            for (const token of colorTokensFrom(modeData)) {
+                if (token.type === "color") values.set(token.name, token.value);
+            }
+        }
+    }
+    for (const token of tokens) {
+        if (token.type === "color") values.set(token.name, token.value);
+    }
+    return values;
+}
+
+function resolveColorValue(value, references, seen = new Set()) {
+    const text = String(value);
+    const reference = /^\{([^}]+)\}$/.exec(text.trim());
+    if (reference) {
+        const name = reference[1];
+        if (seen.has(name) || !references.has(name)) return null;
+        seen.add(name);
+        return resolveColorValue(references.get(name), references, seen);
+    }
+    return globalThis.CSS?.supports?.("color", text) ? text : null;
 }
 
 function render(query = "") {
@@ -47,33 +115,104 @@ function render(query = "") {
 
     const normalized = query.trim().toLowerCase();
     const results = tokens.filter(({ name, value }) => `${name} ${value}`.toLowerCase().includes(normalized));
-    const grouped = Object.groupBy(results, ({ name }) => familyFrom(name));
+    const grouped = Object.groupBy(results, ({ name }) => colorGroupFrom(name, activeColorCategory));
+    const references = colorReferenceValues();
     if (resultLabel) {
         resultLabel.textContent = i18n.tn("app.tokens-found", results.length);
     }
 
     if (!results.length) {
-        groupsContainer.innerHTML = `<p class="border-t border-black/15 pt-10 text-sm text-black/55">${i18n.t("app.no-tokens")}</p>`;
+        groupsContainer.innerHTML = `<p class="border-t border-black/15 pt-10 text-sm text-black/55">${escapeHtml(i18n.t("app.no-tokens"))}</p>`;
         return;
     }
 
     groupsContainer.innerHTML = Object.entries(grouped).map(([family, entries]) => `
-        <section class="scroll-mt-24" id="${family.toLowerCase()}">
+        <section class="scroll-mt-24" id="${escapeHtml(family.toLowerCase())}">
             <div class="mb-5 flex items-baseline justify-between pb-3">
-                <h3 class="text-2xl font-medium text-black capitalize">${family}</h3>
+                <h3 class="text-2xl font-medium text-black capitalize">${escapeHtml(colorGroupLabel(family, activeColorCategory))}</h3>
                 <span class="font-mono text-xs text-black/45">${i18n.tn("app.tokens-count", entries.length)}</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-                ${entries.map(({ name, value }) => `
+                ${entries.map(({ name, value, type }) => {
+                    const displayValue = formatValue(value);
+                    const swatch = type === "color" ? resolveColorValue(value, references) : null;
+                    const copyTitle = escapeHtml(i18n.t("app.copy-token", { name, value: displayValue }));
+                    return `
                     <article class="group min-h-32 border border-black/15 bg-white text-left transition rounded-xl hover:-translate-y-1 hover:shadow-xl">
-                        <button class="block h-20 w-full cursor-pointer rounded-tl-xl rounded-tr-xl border-b border-black/10" type="button" style="background:${value}" data-copy="${value}" data-copy-kind="value" title="${i18n.t("app.copy-token", { name, value: formatValue(value) })}" aria-label="${i18n.t("app.copy-token", { name, value: formatValue(value) })}"></button>
-                        <button class="mt-3 block w-full cursor-pointer px-3 text-left text-[13px] font-medium hover:underline" type="button" data-copy="${name}" data-copy-kind="name" title="${i18n.t("app.copy-name", { icon: name })}">${name}</button>
-                        <button class="block w-full cursor-pointer px-3 pb-3 pt-1 text-left font-mono text-[11px] text-black/50 hover:text-black hover:underline" type="button" data-copy="${value}" data-copy-kind="value" title="${i18n.t("app.copy-token", { name, value: formatValue(value) })}">${formatValue(value)}</button>
+                        ${swatch
+                            ? `<button class="block h-20 w-full cursor-pointer rounded-tl-xl rounded-tr-xl border-b border-black/10" type="button" style="background:${escapeHtml(swatch)}" data-copy="${escapeHtml(value)}" data-copy-kind="value" title="${copyTitle}" aria-label="${copyTitle}"></button>`
+                            : `<div class="flex h-20 items-center justify-center overflow-hidden rounded-tl-xl rounded-tr-xl border-b border-black/10 bg-secondary-50 px-3 text-center font-mono text-xs text-black/55" style="overflow-wrap:anywhere">${escapeHtml(displayValue)}</div>`}
+                        <button class="mt-3 block w-full cursor-pointer px-3 text-left text-[13px] font-medium hover:underline" type="button" data-copy="${escapeHtml(name)}" data-copy-kind="name" title="${escapeHtml(i18n.t("app.copy-name", { icon: name }))}">${escapeHtml(name)}</button>
+                        <button class="block w-full cursor-pointer px-3 pb-3 pt-1 text-left font-mono text-[11px] text-black/50 hover:text-black hover:underline" type="button" data-copy="${escapeHtml(value)}" data-copy-kind="value" title="${copyTitle}">${escapeHtml(displayValue)}</button>
                     </article>
-                `).join("")}
+                `}).join("")}
             </div>
         </section>
     `).join("");
+}
+
+function updateColorTabs() {
+    const tabs = document.querySelectorAll("[data-color-category]");
+    tabs.forEach((tab) => {
+        const selected = tab.dataset.colorCategory === activeColorCategory;
+        tab.hidden = !Object.prototype.hasOwnProperty.call(colorCollections, tab.dataset.colorCategory);
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        tab.className = `shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition ${selected
+            ? "border-primary-500 bg-primary-25 text-primary-800"
+            : "border-black/15 bg-white text-black/55 hover:border-black hover:text-black"}`;
+    });
+
+    const activeTab = [...tabs].find((tab) => tab.dataset.colorCategory === activeColorCategory);
+    const panel = document.querySelector("#color-groups");
+    if (activeTab && panel) panel.setAttribute("aria-labelledby", activeTab.id);
+}
+
+function updateColorModes() {
+    const modeGroup = document.querySelector("#color-modes");
+    if (!modeGroup) return;
+    const modes = Object.keys(colorCollections[activeColorCategory] ?? {});
+    modeGroup.replaceChildren();
+    modeGroup.hidden = modes.length < 2;
+    modeGroup.classList.toggle("hidden", modes.length < 2);
+    modeGroup.setAttribute("aria-label", i18n.t("colors.modes"));
+
+    for (const mode of modes) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition ${mode === activeColorMode
+            ? "border-primary-500 bg-primary-25 text-primary-800"
+            : "border-black/15 bg-white text-black/55 hover:border-black hover:text-black"}`;
+        button.dataset.colorMode = mode;
+        button.setAttribute("aria-pressed", String(mode === activeColorMode));
+        button.textContent = mode === "light"
+            ? i18n.t("colors.mode-light")
+            : mode === "dark"
+                ? i18n.t("colors.mode-dark")
+                : mode;
+        modeGroup.append(button);
+    }
+}
+
+function activateColorCategory(category) {
+    if (!Object.prototype.hasOwnProperty.call(colorCollections, category)) return;
+    activeColorCategory = category;
+    const modes = colorCollections[category];
+    if (!Object.prototype.hasOwnProperty.call(modes, activeColorMode)) {
+        activeColorMode = Object.keys(modes)[0] ?? "";
+    }
+    tokens = colorTokensFrom(modes[activeColorMode]);
+    updateColorTabs();
+    updateColorModes();
+    render(document.querySelector("#color-search")?.value ?? "");
+}
+
+function activateColorMode(mode) {
+    if (!Object.prototype.hasOwnProperty.call(colorCollections[activeColorCategory] ?? {}, mode)) return;
+    activeColorMode = mode;
+    tokens = colorTokensFrom(colorCollections[activeColorCategory][mode]);
+    updateColorModes();
+    render(document.querySelector("#color-search")?.value ?? "");
 }
 
 function showToast(message) {
@@ -87,24 +226,54 @@ function showToast(message) {
 }
 
 function initializeColorCatalog() {
+    const colorTabs = document.querySelector("#color-tabs");
+    colorTabs?.addEventListener("click", (event) => {
+        const tab = event.target.closest("[data-color-category]");
+        if (tab) activateColorCategory(tab.dataset.colorCategory);
+    });
+    colorTabs?.addEventListener("keydown", (event) => {
+        const tab = event.target.closest("[data-color-category]");
+        if (!tab) return;
+        const tabs = [...colorTabs.querySelectorAll("[data-color-category]:not([hidden])")];
+        const index = tabs.indexOf(tab);
+        const nextIndex = event.key === "ArrowRight"
+            ? (index + 1) % tabs.length
+            : event.key === "ArrowLeft"
+                ? (index - 1 + tabs.length) % tabs.length
+                : event.key === "Home"
+                    ? 0
+                    : event.key === "End"
+                        ? tabs.length - 1
+                        : -1;
+        if (nextIndex < 0) return;
+        event.preventDefault();
+        tabs[nextIndex].focus();
+        activateColorCategory(tabs[nextIndex].dataset.colorCategory);
+    });
+
+    document.querySelector("#color-modes")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-color-mode]");
+        if (button) activateColorMode(button.dataset.colorMode);
+    });
+
     const groupsContainer = document.querySelector("#color-groups");
     const searchInput = document.querySelector("#color-search");
 
     if (groupsContainer) {
-    groupsContainer.addEventListener("click", async (event) => {
-        const target = event.target.closest("[data-copy]");
-        if (!target) return;
-        try {
-            await navigator.clipboard.writeText(target.dataset.copy);
-            showToast(i18n.t("app.copied", { value: formatValue(target.dataset.copy) }));
-        } catch {
-            showToast(i18n.t(target.dataset.copyKind === "name" ? "app.copy-name-failed" : "app.copy-value-failed"));
-        }
-    });
+        groupsContainer.addEventListener("click", async (event) => {
+            const target = event.target.closest("[data-copy]");
+            if (!target) return;
+            try {
+                await navigator.clipboard.writeText(target.dataset.copy);
+                showToast(i18n.t("app.copied", { value: formatValue(target.dataset.copy) }));
+            } catch {
+                showToast(i18n.t(target.dataset.copyKind === "name" ? "app.copy-name-failed" : "app.copy-value-failed"));
+            }
+        });
     }
 
     if (searchInput) {
-    searchInput.addEventListener("input", (event) => render(event.target.value));
+        searchInput.addEventListener("input", (event) => render(event.target.value));
     }
 }
 
@@ -371,13 +540,14 @@ async function loadTokens() {
         const response = await fetch("/colors.json");
         if (!response.ok) throw new Error(i18n.t("app.colors-unavailable"));
         const collection = await response.json();
-        const palette = collection[0]?.Palette?.modes?.color ?? {};
-        tokens = Object.entries(palette)
-            .filter(([, token]) => token.$type === "color")
-            .map(([name, token]) => ({ name, value: token.$value }));
-        const tokenCount = document.querySelector("#token-count");
-        if (tokenCount) tokenCount.textContent = tokens.length;
-        render();
+        colorCollections = Object.fromEntries(collection.flatMap((item) =>
+            Object.entries(item).filter(([, data]) => data?.modes).map(([name, data]) => [name, data.modes]),
+        ));
+        if (!Object.keys(colorCollections).length) throw new Error(i18n.t("app.colors-unavailable"));
+        if (!Object.prototype.hasOwnProperty.call(colorCollections, activeColorCategory)) {
+            activeColorCategory = Object.keys(colorCollections)[0];
+        }
+        activateColorCategory(activeColorCategory);
     } catch (error) {
         const resultLabel = document.querySelector("#result-label");
         const groupsContainer = document.querySelector("#color-groups");
@@ -522,7 +692,9 @@ const hidePageLoader = showPageLoader();
 setTimeout(hidePageLoader, 10000);
 
 document.addEventListener("lumen:languagechange", () => {
-    if (tokens.length) render(document.querySelector("#color-search")?.value ?? "");
+    updateColorTabs();
+    updateColorModes();
+    if (document.querySelector("#color-tabs")) render(document.querySelector("#color-search")?.value ?? "");
     if (figmaIcons.length) renderFigmaIconCatalog(document.querySelector("#icon-search")?.value ?? "");
     renderButtonCatalog();
     renderUpdates();

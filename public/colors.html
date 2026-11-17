@@ -44,7 +44,16 @@
                 </section>
 
                 <section class="mx-auto max-w-360 px-5 py-16 lg:px-10" id="cores">
-                    <div class="grid gap-16" id="color-groups" aria-live="polite"></div>
+                    <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex gap-2 overflow-x-auto border-b border-black/15 pb-4" id="color-tabs" role="tablist" aria-label="Categorias de variaveis" data-i18n-attr="aria-label:colors.category-tabs">
+                            <button class="shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition border-primary-500 bg-primary-25 text-primary-800" id="color-tab-palette" type="button" role="tab" aria-controls="color-groups" aria-selected="true" tabindex="0" data-color-category="Palette" data-i18n="colors.palette">Paleta</button>
+                            <button class="shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition border-black/15 bg-white text-black/55 hover:border-black hover:text-black" id="color-tab-web-elements" type="button" role="tab" aria-controls="color-groups" aria-selected="false" tabindex="-1" data-color-category="Web Elements" data-i18n="colors.web-elements">Elementos Web</button>
+                            <button class="shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition border-black/15 bg-white text-black/55 hover:border-black hover:text-black" id="color-tab-web-components" type="button" role="tab" aria-controls="color-groups" aria-selected="false" tabindex="-1" data-color-category="Web Components" data-i18n="colors.web-components">Componentes Web</button>
+                        </div>
+                        <div class="hidden shrink-0 gap-2" id="color-modes" role="group" aria-label="Tema de cores" data-i18n-attr="aria-label:colors.modes"></div>
+                    </div>
+                    <p class="mb-8 text-sm text-black/55" id="result-label" aria-live="polite"></p>
+                    <div class="grid gap-16" id="color-groups" role="tabpanel" aria-labelledby="color-tab-palette" tabindex="0" aria-live="polite"></div>
                 </section>
 
                 <section class="border-t border-black/15 bg-white" id="em-breve">
