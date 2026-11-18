@@ -6,6 +6,9 @@ let activeIconFacet = "type";
 let colorCollections = {};
 let activeColorCategory = "Palette";
 let activeColorMode = "";
+let tokenCatalog = null;
+let activeTokenCollection = "all";
+let activeTokenMode = "light";
 const buttonSelection = { color: "primary", shape: "slightlyRounded", style: "filled" };
 const buttonVariantDefinitions = [
     "primary|none|icon|default|false", "red|slightlyRounded|text|default|false", "primary|none|text|default|false", "primary|none|icon|active|false",
@@ -28,7 +31,7 @@ const iconFilters = {
     monochrome: "false",
 };
 
-if ("EventSource" in window) {
+if ("EventSource" in window && ["localhost", "127.0.0.1"].includes(location.hostname)) {
     const liveReload = new EventSource("/live-reload");
     liveReload.addEventListener("reload", () => window.location.reload());
     window.addEventListener("pagehide", () => liveReload.close());
@@ -122,15 +125,15 @@ function render(query = "") {
     }
 
     if (!results.length) {
-        groupsContainer.innerHTML = `<p class="border-t border-black/15 pt-10 text-sm text-black/55">${escapeHtml(i18n.t("app.no-tokens"))}</p>`;
+        groupsContainer.innerHTML = `<p class="border-t border-pp-palette-black/15 pt-10 text-sm text-pp-palette-black/55">${escapeHtml(i18n.t("app.no-tokens"))}</p>`;
         return;
     }
 
     groupsContainer.innerHTML = Object.entries(grouped).map(([family, entries]) => `
         <section class="scroll-mt-24" id="${escapeHtml(family.toLowerCase())}">
             <div class="mb-5 flex items-baseline justify-between pb-3">
-                <h3 class="text-2xl font-medium text-black capitalize">${escapeHtml(colorGroupLabel(family, activeColorCategory))}</h3>
-                <span class="font-mono text-xs text-black/45">${i18n.tn("app.tokens-count", entries.length)}</span>
+                <h3 class="text-2xl font-medium text-pp-palette-black capitalize">${escapeHtml(colorGroupLabel(family, activeColorCategory))}</h3>
+                <span class="font-mono text-xs text-pp-palette-black/45">${i18n.tn("app.tokens-count", entries.length)}</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-2">
                 ${entries.map(({ name, value, type }) => {
@@ -138,34 +141,17 @@ function render(query = "") {
                     const swatch = type === "color" ? resolveColorValue(value, references) : null;
                     const copyTitle = escapeHtml(i18n.t("app.copy-token", { name, value: displayValue }));
                     return `
-                    <article class="group min-h-32 border border-black/15 bg-white text-left transition rounded-xl hover:-translate-y-1 hover:shadow-xl">
+                    <article class="group min-h-32 border border-pp-palette-black/15 bg-pp-palette-white text-left transition rounded-xl hover:-translate-y-1 hover:shadow-xl">
                         ${swatch
-                            ? `<button class="block h-20 w-full cursor-pointer rounded-tl-xl rounded-tr-xl border-b border-black/10" type="button" style="background:${escapeHtml(swatch)}" data-copy="${escapeHtml(value)}" data-copy-kind="value" title="${copyTitle}" aria-label="${copyTitle}"></button>`
-                            : `<div class="flex h-20 items-center justify-center overflow-hidden rounded-tl-xl rounded-tr-xl border-b border-black/10 bg-secondary-50 px-3 text-center font-mono text-xs text-black/55" style="overflow-wrap:anywhere">${escapeHtml(displayValue)}</div>`}
+                            ? `<button class="block h-20 w-full cursor-pointer rounded-tl-xl rounded-tr-xl border-b border-pp-palette-black/10" type="button" style="background:${escapeHtml(swatch)}" data-copy="${escapeHtml(value)}" data-copy-kind="value" title="${copyTitle}" aria-label="${copyTitle}"></button>`
+                            : `<div class="flex h-20 items-center justify-center overflow-hidden rounded-tl-xl rounded-tr-xl border-b border-pp-palette-black/10 bg-pp-palette-secondary-50 px-3 text-center font-mono text-xs text-pp-palette-black/55" style="overflow-wrap:anywhere">${escapeHtml(displayValue)}</div>`}
                         <button class="mt-3 block w-full cursor-pointer px-3 text-left text-[13px] font-medium hover:underline" type="button" data-copy="${escapeHtml(name)}" data-copy-kind="name" title="${escapeHtml(i18n.t("app.copy-name", { icon: name }))}">${escapeHtml(name)}</button>
-                        <button class="block w-full cursor-pointer px-3 pb-3 pt-1 text-left font-mono text-[11px] text-black/50 hover:text-black hover:underline" type="button" data-copy="${escapeHtml(value)}" data-copy-kind="value" title="${copyTitle}">${escapeHtml(displayValue)}</button>
+                        <button class="block w-full cursor-pointer px-3 pb-3 pt-1 text-left font-mono text-[11px] text-pp-palette-black/50 hover:text-pp-palette-black hover:underline" type="button" data-copy="${escapeHtml(value)}" data-copy-kind="value" title="${copyTitle}">${escapeHtml(displayValue)}</button>
                     </article>
                 `}).join("")}
             </div>
         </section>
     `).join("");
-}
-
-function updateColorTabs() {
-    const tabs = document.querySelectorAll("[data-color-category]");
-    tabs.forEach((tab) => {
-        const selected = tab.dataset.colorCategory === activeColorCategory;
-        tab.hidden = !Object.prototype.hasOwnProperty.call(colorCollections, tab.dataset.colorCategory);
-        tab.setAttribute("aria-selected", String(selected));
-        tab.tabIndex = selected ? 0 : -1;
-        tab.className = `shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition ${selected
-            ? "border-primary-500 bg-primary-25 text-primary-800"
-            : "border-black/15 bg-white text-black/55 hover:border-black hover:text-black"}`;
-    });
-
-    const activeTab = [...tabs].find((tab) => tab.dataset.colorCategory === activeColorCategory);
-    const panel = document.querySelector("#color-groups");
-    if (activeTab && panel) panel.setAttribute("aria-labelledby", activeTab.id);
 }
 
 function updateColorModes() {
@@ -181,8 +167,8 @@ function updateColorModes() {
         const button = document.createElement("button");
         button.type = "button";
         button.className = `shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition ${mode === activeColorMode
-            ? "border-primary-500 bg-primary-25 text-primary-800"
-            : "border-black/15 bg-white text-black/55 hover:border-black hover:text-black"}`;
+            ? "border-pp-palette-primary-500 bg-pp-palette-primary-25 text-pp-palette-primary-800"
+            : "border-pp-palette-black/15 bg-pp-palette-white text-pp-palette-black/55 hover:border-pp-palette-black hover:text-pp-palette-black"}`;
         button.dataset.colorMode = mode;
         button.setAttribute("aria-pressed", String(mode === activeColorMode));
         button.textContent = mode === "light"
@@ -202,7 +188,6 @@ function activateColorCategory(category) {
         activeColorMode = Object.keys(modes)[0] ?? "";
     }
     tokens = colorTokensFrom(modes[activeColorMode]);
-    updateColorTabs();
     updateColorModes();
     render(document.querySelector("#color-search")?.value ?? "");
 }
@@ -226,31 +211,6 @@ function showToast(message) {
 }
 
 function initializeColorCatalog() {
-    const colorTabs = document.querySelector("#color-tabs");
-    colorTabs?.addEventListener("click", (event) => {
-        const tab = event.target.closest("[data-color-category]");
-        if (tab) activateColorCategory(tab.dataset.colorCategory);
-    });
-    colorTabs?.addEventListener("keydown", (event) => {
-        const tab = event.target.closest("[data-color-category]");
-        if (!tab) return;
-        const tabs = [...colorTabs.querySelectorAll("[data-color-category]:not([hidden])")];
-        const index = tabs.indexOf(tab);
-        const nextIndex = event.key === "ArrowRight"
-            ? (index + 1) % tabs.length
-            : event.key === "ArrowLeft"
-                ? (index - 1 + tabs.length) % tabs.length
-                : event.key === "Home"
-                    ? 0
-                    : event.key === "End"
-                        ? tabs.length - 1
-                        : -1;
-        if (nextIndex < 0) return;
-        event.preventDefault();
-        tabs[nextIndex].focus();
-        activateColorCategory(tabs[nextIndex].dataset.colorCategory);
-    });
-
     document.querySelector("#color-modes")?.addEventListener("click", (event) => {
         const button = event.target.closest("[data-color-mode]");
         if (button) activateColorMode(button.dataset.colorMode);
@@ -274,6 +234,246 @@ function initializeColorCatalog() {
 
     if (searchInput) {
         searchInput.addEventListener("input", (event) => render(event.target.value));
+    }
+}
+
+const tokenCollectionI18n = {
+    Palette: "colors.palette",
+    "Web Elements": "colors.web-elements",
+    "Web Components": "colors.web-components",
+};
+
+function tokenCollectionLabel(name) {
+    const key = tokenCollectionI18n[name];
+    return key ? i18n.t(key) : name;
+}
+
+function tokenValue(token, mode = activeTokenMode) {
+    return token[mode] ?? token.light;
+}
+
+function resolveTokenReference(value, references, seen = new Set()) {
+    const text = String(value).trim();
+    const reference = /^var\(\s*(--[a-z0-9-]+)\s*\)$/i.exec(text);
+    if (!reference) return text;
+    const name = reference[1];
+    if (seen.has(name) || !references.has(name)) return text;
+    seen.add(name);
+    return resolveTokenReference(references.get(name), references, seen);
+}
+
+function tokenPreviewPlaceholder() {
+    return `<span class="flex h-8 items-center font-mono text-xs text-pp-palette-black/30" aria-hidden="true">—</span>`;
+}
+
+function tokenPreview(token, value) {
+    const text = String(value).trim();
+    switch (token.type) {
+        case "color": {
+            if (!globalThis.CSS?.supports?.("color", text)) return tokenPreviewPlaceholder();
+            return `<span class="relative inline-block size-8 overflow-hidden rounded-md border border-pp-palette-black/15" style="background-image:linear-gradient(45deg,#e3e3e3 25%,transparent 25%,transparent 75%,#e3e3e3 75%),linear-gradient(45deg,#e3e3e3 25%,#fff 25%,#fff 75%,#e3e3e3 75%);background-size:8px 8px;background-position:0 0,4px 4px"><span class="absolute inset-0" style="background:${escapeHtml(text)}"></span></span>`;
+        }
+        case "font-size": {
+            const size = Number.parseFloat(text);
+            if (!Number.isFinite(size)) return tokenPreviewPlaceholder();
+            return `<span class="flex h-8 items-center text-pp-palette-black" style="font-size:${Math.min(Math.max(size, 10), 28)}px;line-height:1">Aa</span>`;
+        }
+        case "line-height": {
+            const height = Number.parseFloat(text);
+            if (!Number.isFinite(height)) return tokenPreviewPlaceholder();
+            return `<span class="flex h-8 items-center text-pp-palette-black" style="font-size:12px;line-height:${Math.min(Math.max(height, 12), 28)}px">Aa</span>`;
+        }
+        case "font-family": {
+            const family = text.replace(/^["']|["']$/g, "");
+            return `<span class="flex h-8 items-center text-pp-palette-black" style="font-family:${escapeHtml(family)};font-size:16px">Aa</span>`;
+        }
+        case "font-weight": {
+            const weights = { light: 300, regular: 400, medium: 500, bold: 700 };
+            const weight = weights[text.replace(/^["']|["']$/g, "").toLowerCase()] ?? Number.parseInt(text, 10);
+            return `<span class="flex h-8 items-center text-pp-palette-black" style="font-size:16px;font-weight:${Number.isFinite(weight) ? weight : 400}">Aa</span>`;
+        }
+        case "tracking": {
+            const percent = Number.parseFloat(text);
+            const spacing = text.endsWith("%") && Number.isFinite(percent) ? `${percent / 100}em` : text;
+            return `<span class="flex h-8 items-center text-pp-palette-black" style="font-size:14px;letter-spacing:${escapeHtml(spacing)}">Aa</span>`;
+        }
+        case "shape": {
+            return `<span class="inline-block size-8 border border-pp-palette-black/30 bg-pp-palette-secondary-50" style="border-radius:${escapeHtml(text)}"></span>`;
+        }
+        case "component": {
+            const content = text.replace(/^["']|["']$/g, "");
+            if (!content || /^-?\d+(\.\d+)?$/.test(content)) return tokenPreviewPlaceholder();
+            return `<span class="line-clamp-2 max-w-16 text-[10px] leading-tight text-pp-palette-black/55">${escapeHtml(content)}</span>`;
+        }
+        default:
+            return tokenPreviewPlaceholder();
+    }
+}
+
+function renderTokenTabs() {
+    const tabs = document.querySelector("#token-tabs");
+    if (!tabs || !tokenCatalog) return;
+    const options = [
+        { name: "all", label: i18n.t("tokens.todos") },
+        ...tokenCatalog.collections.map(({ name }) => ({ name, label: tokenCollectionLabel(name) })),
+    ];
+    tabs.innerHTML = options.map(({ name, label }) => {
+        const selected = name === activeTokenCollection;
+        return `<button class="shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-xs font-medium transition ${selected
+            ? "border-pp-palette-primary-500 bg-pp-palette-primary-25 text-pp-palette-primary-800"
+            : "border-pp-palette-black/15 bg-pp-palette-white text-pp-palette-black/55 hover:border-pp-palette-black hover:text-pp-palette-black"}" type="button" role="tab" aria-selected="${selected}" tabindex="${selected ? 0 : -1}" data-token-collection="${escapeHtml(name)}">${escapeHtml(label)}</button>`;
+    }).join("");
+}
+
+function renderTokenModes() {
+    const container = document.querySelector("#token-modes");
+    if (!container) return;
+    container.innerHTML = ["light", "dark"].map((mode) => {
+        const selected = mode === activeTokenMode;
+        const label = i18n.t(mode === "light" ? "tokens.claro" : "tokens.escuro");
+        return `<button class="shrink-0 cursor-pointer rounded-xl border px-4 py-2 text-xs font-medium transition ${selected
+            ? "border-pp-palette-primary-500 bg-pp-palette-primary-25 text-pp-palette-primary-800"
+            : "border-pp-palette-black/15 bg-pp-palette-white text-pp-palette-black/55 hover:border-pp-palette-black hover:text-pp-palette-black"}" type="button" data-token-mode="${mode}" aria-pressed="${selected}">${escapeHtml(label)}</button>`;
+    }).join("");
+}
+
+function renderTokenRow(token, references) {
+    const rawValue = tokenValue(token);
+    const resolvedValue = resolveTokenReference(rawValue, references);
+    const displayRaw = formatValue(rawValue);
+    const displayResolved = formatValue(resolvedValue);
+    const copyNameTitle = escapeHtml(i18n.t("tokens.copy-variavel", { name: token.name }));
+    const copyValueTitle = escapeHtml(i18n.t("tokens.copy-valor", { name: token.name, value: displayResolved }));
+    return `
+        <tr class="align-top transition hover:bg-pp-palette-secondary-50/60">
+            <td class="px-4 py-3">${tokenPreview(token, resolvedValue)}</td>
+            <td class="px-4 py-3">
+                <button class="block max-w-full cursor-pointer break-all text-left font-mono text-xs font-medium text-pp-palette-black hover:underline" type="button" data-copy="${escapeHtml(token.name)}" data-copy-kind="name" title="${copyNameTitle}">${escapeHtml(token.name)}</button>
+            </td>
+            <td class="px-4 py-3">
+                <button class="block max-w-full cursor-pointer break-all text-left font-mono text-[11px] text-pp-palette-black/55 hover:text-pp-palette-black hover:underline" type="button" data-copy="${escapeHtml(rawValue)}" data-copy-kind="value" title="${copyValueTitle}">${escapeHtml(displayRaw)}</button>
+            </td>
+            <td class="px-4 py-3 font-mono text-[11px] text-pp-palette-black/55">${displayRaw === displayResolved ? "—" : escapeHtml(displayResolved)}</td>
+            <td class="hidden px-4 py-3 sm:table-cell">
+                <span class="inline-flex rounded-md border border-pp-palette-black/10 bg-pp-palette-secondary-50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-pp-palette-black/50">${escapeHtml(token.type)}</span>
+            </td>
+        </tr>
+    `;
+}
+
+function renderTokenTable(query = "") {
+    const rows = document.querySelector("#token-rows");
+    const resultLabel = document.querySelector("#token-result-label");
+    if (!rows || !tokenCatalog) return;
+
+    const normalized = query.trim().toLowerCase();
+    const references = new Map(tokenCatalog.collections.flatMap(({ tokens }) => tokens.map((token) => [token.name, tokenValue(token)])));
+    const collections = tokenCatalog.collections
+        .filter(({ name }) => activeTokenCollection === "all" || name === activeTokenCollection)
+        .map(({ name, tokens }) => ({
+            name,
+            tokens: tokens.filter((token) => {
+                const rawValue = tokenValue(token);
+                const resolvedValue = resolveTokenReference(rawValue, references);
+                return `${token.name} ${rawValue} ${resolvedValue} ${token.type}`.toLowerCase().includes(normalized);
+            }),
+        }))
+        .filter(({ tokens }) => tokens.length);
+    const total = collections.reduce((sum, { tokens }) => sum + tokens.length, 0);
+
+    if (resultLabel) resultLabel.textContent = i18n.tn("app.variables-found", total);
+    if (!total) {
+        rows.innerHTML = `<tr><td class="px-4 py-8 text-sm text-pp-palette-black/55" colspan="5">${escapeHtml(i18n.t("tokens.nenhum"))}</td></tr>`;
+        return;
+    }
+
+    rows.innerHTML = collections.map(({ name, tokens }) => `
+        <tr class="bg-pp-palette-secondary-50/70">
+            <th class="px-4 py-2 text-left text-[11px] font-medium uppercase tracking-widest text-pp-palette-black/45" scope="colgroup" colspan="5">
+                ${escapeHtml(tokenCollectionLabel(name))}
+                <span class="ml-2 font-mono text-[11px] normal-case tracking-normal text-pp-palette-black/40">${escapeHtml(i18n.tn("app.tokens-count", tokens.length))}</span>
+            </th>
+        </tr>
+        ${tokens.map((token) => renderTokenRow(token, references)).join("")}
+    `).join("");
+}
+
+function activateTokenCollection(collection) {
+    activeTokenCollection = collection;
+    renderTokenTabs();
+    renderTokenTable(document.querySelector("#token-search")?.value ?? "");
+}
+
+function activateTokenMode(mode) {
+    activeTokenMode = mode;
+    renderTokenModes();
+    renderTokenTable(document.querySelector("#token-search")?.value ?? "");
+}
+
+function initializeTokenCatalog() {
+    const tabs = document.querySelector("#token-tabs");
+    const rows = document.querySelector("#token-rows");
+    const searchInput = document.querySelector("#token-search");
+
+    tabs?.addEventListener("click", (event) => {
+        const tab = event.target.closest("[data-token-collection]");
+        if (tab) activateTokenCollection(tab.dataset.tokenCollection);
+    });
+
+    tabs?.addEventListener("keydown", (event) => {
+        const tab = event.target.closest("[data-token-collection]");
+        if (!tab) return;
+        const available = [...tabs.querySelectorAll("[data-token-collection]")];
+        const index = available.indexOf(tab);
+        const nextIndex = event.key === "ArrowRight"
+            ? (index + 1) % available.length
+            : event.key === "ArrowLeft"
+                ? (index - 1 + available.length) % available.length
+                : event.key === "Home"
+                    ? 0
+                    : event.key === "End"
+                        ? available.length - 1
+                        : -1;
+        if (nextIndex < 0) return;
+        event.preventDefault();
+        available[nextIndex].focus();
+        activateTokenCollection(available[nextIndex].dataset.tokenCollection);
+    });
+
+    document.querySelector("#token-modes")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-token-mode]");
+        if (button) activateTokenMode(button.dataset.tokenMode);
+    });
+
+    searchInput?.addEventListener("input", (event) => renderTokenTable(event.target.value));
+
+    rows?.addEventListener("click", async (event) => {
+        const target = event.target.closest("[data-copy]");
+        if (!target) return;
+        try {
+            await navigator.clipboard.writeText(target.dataset.copy);
+            showToast(i18n.t("app.copied", { value: formatValue(target.dataset.copy) }));
+        } catch {
+            showToast(i18n.t(target.dataset.copyKind === "name" ? "app.copy-name-failed" : "app.copy-value-failed"));
+        }
+    });
+}
+
+async function loadTokenCatalog() {
+    const rows = document.querySelector("#token-rows");
+    if (!rows) return;
+    try {
+        const response = await fetch("/tokens.json");
+        if (!response.ok) throw new Error(i18n.t("tokens.indisponivel"));
+        tokenCatalog = await response.json();
+        if (!tokenCatalog.collections?.length) throw new Error(i18n.t("tokens.indisponivel"));
+        renderTokenTabs();
+        renderTokenModes();
+        renderTokenTable(document.querySelector("#token-search")?.value ?? "");
+    } catch (error) {
+        const resultLabel = document.querySelector("#token-result-label");
+        if (resultLabel) resultLabel.textContent = i18n.t("app.tokens-failed");
+        rows.innerHTML = `<tr><td class="px-4 py-8 text-sm text-pp-palette-red-700" colspan="5">${escapeHtml(error.message)}</td></tr>`;
     }
 }
 
@@ -304,44 +504,44 @@ function renderButtonCatalog() {
     if (!container) return;
 
     const styleClasses = {
-        primary: "bg-primary-500 text-white hover:bg-primary-800",
-        primary25: "bg-primary-25 text-primary-800 hover:bg-primary-500",
-        appPrimary: "bg-primary-800 text-white hover:bg-primary-500",
-        secondary: "bg-secondary-100 text-black hover:bg-secondary-200",
-        tertiary: "bg-tertiary-500 text-black hover:bg-tertiary-600",
-        red: "bg-red-600 text-white hover:bg-red-700",
-        green: "bg-green-600 text-white hover:bg-green-700",
-        white: "bg-white text-black shadow-sm hover:bg-secondary-50",
+        primary: "bg-pp-palette-primary-500 text-pp-palette-white hover:bg-pp-palette-primary-800",
+        primary25: "bg-pp-palette-primary-25 text-pp-palette-primary-800 hover:bg-pp-palette-primary-500",
+        appPrimary: "bg-pp-palette-primary-800 text-pp-palette-white hover:bg-pp-palette-primary-500",
+        secondary: "bg-pp-palette-secondary-100 text-pp-palette-black hover:bg-pp-palette-secondary-200",
+        tertiary: "bg-pp-palette-tertiary-500 text-pp-palette-black hover:bg-pp-palette-tertiary-600",
+        red: "bg-pp-palette-red-600 text-pp-palette-white hover:bg-pp-palette-red-700",
+        green: "bg-pp-palette-green-600 text-pp-palette-white hover:bg-pp-palette-green-700",
+        white: "bg-pp-palette-white text-pp-palette-black shadow-sm hover:bg-pp-palette-secondary-50",
     };
     const outlineText = {
-        primary: "!text-primary-500 hover:!bg-primary-500/10",
-        primary25: "!text-primary-25 hover:!bg-primary-25/10",
-        appPrimary: "!text-primary-300 hover:!bg-primary-300/10",
-        secondary: "!text-white hover:!bg-white/10",
-        tertiary: "!text-tertiary-500 hover:!bg-tertiary-500/10",
-        red: "!text-red-500 hover:!bg-red-500/10",
-        green: "!text-green-500 hover:!bg-green-500/10",
-        white: "!text-white hover:!bg-white/10",
+        primary: "!text-pp-palette-primary-500 hover:!bg-pp-palette-primary-500/10",
+        primary25: "!text-pp-palette-primary-25 hover:!bg-pp-palette-primary-25/10",
+        appPrimary: "!text-pp-palette-primary-300 hover:!bg-pp-palette-primary-300/10",
+        secondary: "!text-pp-palette-white hover:!bg-pp-palette-white/10",
+        tertiary: "!text-pp-palette-tertiary-500 hover:!bg-pp-palette-tertiary-500/10",
+        red: "!text-pp-palette-red-500 hover:!bg-pp-palette-red-500/10",
+        green: "!text-pp-palette-green-500 hover:!bg-pp-palette-green-500/10",
+        white: "!text-pp-palette-white hover:!bg-pp-palette-white/10",
     };
     const activeFilled = {
-        primary: "!bg-primary-400",
-        primary25: "!bg-primary-50",
-        appPrimary: "!bg-primary-700",
-        secondary: "!bg-secondary-200",
-        tertiary: "!bg-tertiary-400",
-        red: "!bg-red-500",
-        green: "!bg-green-500",
-        white: "!bg-secondary-50",
+        primary: "!bg-pp-palette-primary-400",
+        primary25: "!bg-pp-palette-primary-50",
+        appPrimary: "!bg-pp-palette-primary-700",
+        secondary: "!bg-pp-palette-secondary-200",
+        tertiary: "!bg-pp-palette-tertiary-400",
+        red: "!bg-pp-palette-red-500",
+        green: "!bg-pp-palette-green-500",
+        white: "!bg-pp-palette-secondary-50",
     };
     const activeText = {
-        primary: "!text-primary-400",
-        primary25: "!text-primary-700",
-        appPrimary: "!text-primary-400",
-        secondary: "!text-white/70",
-        tertiary: "!text-tertiary-400",
-        red: "!text-red-500",
-        green: "!text-green-500",
-        white: "!text-white/70",
+        primary: "!text-pp-palette-primary-400",
+        primary25: "!text-pp-palette-primary-700",
+        appPrimary: "!text-pp-palette-primary-400",
+        secondary: "!text-pp-palette-white/70",
+        tertiary: "!text-pp-palette-tertiary-400",
+        red: "!text-pp-palette-red-500",
+        green: "!text-pp-palette-green-500",
+        white: "!text-pp-palette-white/70",
     };
     const shapeClasses = {
         none: "rounded-none",
@@ -375,16 +575,16 @@ function renderButtonCatalog() {
     container.innerHTML = states.map(([state, stateLabel]) => {
         const isDisabled = state === "disabled";
         const stateClass = isDisabled ? "cursor-not-allowed opacity-40" : state === "active" ? (type === "filled" || type === "icon" ? activeFilled[color] : activeText[color]) : "";
-        const typeClass = type === "outline" ? `border border-current !bg-transparent ${state === "active" ? activeText[color] : outlineText[color]}` : type === "text" ? `bg-transparent${color === "tertiary" ? " !bg-transparent !text-tertiary-700 hover:!bg-tertiary-50" : ""}` : "";
+        const typeClass = type === "outline" ? `border border-current !bg-transparent ${state === "active" ? activeText[color] : outlineText[color]}` : type === "text" ? `bg-transparent${color === "tertiary" ? " !bg-transparent !text-pp-palette-tertiary-700 hover:!bg-pp-palette-tertiary-50" : ""}` : "";
         const iconClass = type === "icon" ? "size-10 px-0" : "px-4";
         const label = `${color} / ${shape} / ${type} / ${state}`;
         return `
-            <article class="min-w-0 bg-white p-5">
-                <div class="flex min-h-40 items-center justify-center border border-black/10 ${type === "outline" ? "bg-black" : "bg-secondary-50"} p-4">
-                    <button class="${shapeClasses[shape]} ${styleClasses[color]} ${typeClass} ${iconClass} py-2.5 text-sm font-medium transition focus:outline-2 focus:outline-offset-2 focus:outline-primary-500 ${stateClass}" type="button" ${isDisabled ? "disabled" : ""} aria-label="${label}">${typeLabels[type]}</button>
+            <article class="min-w-0 bg-pp-palette-white p-5">
+                <div class="flex min-h-40 items-center justify-center border border-pp-palette-black/10 ${type === "outline" ? "bg-pp-palette-black" : "bg-pp-palette-secondary-50"} p-4">
+                    <button class="${shapeClasses[shape]} ${styleClasses[color]} ${typeClass} ${iconClass} py-2.5 text-sm font-medium transition focus:outline-2 focus:outline-offset-2 focus:outline-pp-palette-primary-500 ${stateClass}" type="button" ${isDisabled ? "disabled" : ""} aria-label="${label}">${typeLabels[type]}</button>
                 </div>
-                <p class="mt-4 break-words font-mono text-xs text-black/70">${label}</p>
-                <p class="mt-2 text-[11px] uppercase tracking-wide text-black/45">State=${stateLabel}</p>
+                <p class="mt-4 break-words font-mono text-xs text-pp-palette-black/70">${label}</p>
+                <p class="mt-2 text-[11px] uppercase tracking-wide text-pp-palette-black/45">State=${stateLabel}</p>
             </article>
         `;
     }).join("");
@@ -418,7 +618,7 @@ function renderFigmaIconCatalog(query = "") {
             ? activeIconFacet === "type"
             : activeIconFacet === facet && iconFilters[facet] === value;
         return `
-        <button class="shrink-0 border px-4 py-2 text-xs font-medium transition ${selected ? "border-primary-500 bg-primary-25 text-primary-800 rounded-xl" : "border-black/15 bg-white text-black/55 hover:border-black hover:text-black rounded-xl"}" type="button" data-icon-facet="${facet}" data-icon-value="${value ?? ""}" role="tab" aria-selected="${selected}">${label}</button>
+        <button class="shrink-0 border px-4 py-2 text-xs font-medium transition ${selected ? "border-pp-palette-primary-500 bg-pp-palette-primary-25 text-pp-palette-primary-800 rounded-xl" : "border-pp-palette-black/15 bg-pp-palette-white text-pp-palette-black/55 hover:border-pp-palette-black hover:text-pp-palette-black rounded-xl"}" type="button" data-icon-facet="${facet}" data-icon-value="${value ?? ""}" role="tab" aria-selected="${selected}">${label}</button>
     `;
     }).join("");
 
@@ -429,7 +629,7 @@ function renderFigmaIconCatalog(query = "") {
     }
     optionsContainer.innerHTML = activeIconFacet === "type"
         ? ["todos", ...valuesFor("type")].map((value) => `
-            <button class="block w-full border-l-2 px-3 py-2 text-left text-xs transition ${value === iconFilters.type ? "border-primary-500 bg-primary-25 font-medium text-primary-800" : "border-transparent text-black/55 hover:border-black hover:bg-black/5 hover:text-black"}" type="button" data-icon-option="${value}" aria-pressed="${value === iconFilters.type}">${value === "todos" ? i18n.t("app.option-all") : value}</button>
+            <button class="block w-full border-l-2 px-3 py-2 text-left text-xs transition ${value === iconFilters.type ? "border-pp-palette-primary-500 bg-pp-palette-primary-25 font-medium text-pp-palette-primary-800" : "border-transparent text-pp-palette-black/55 hover:border-pp-palette-black hover:bg-pp-palette-black/5 hover:text-pp-palette-black"}" type="button" data-icon-option="${value}" aria-pressed="${value === iconFilters.type}">${value === "todos" ? i18n.t("app.option-all") : value}</button>
         `).join("")
         : "";
 
@@ -444,19 +644,19 @@ function renderFigmaIconCatalog(query = "") {
 
     if (resultLabel) resultLabel.textContent = i18n.tn("app.icons-found", results.length);
     if (!results.length) {
-        grid.innerHTML = `<p class="col-span-full bg-white p-6 text-sm text-black/55">${i18n.t("app.no-icons")}</p>`;
+        grid.innerHTML = `<p class="col-span-full bg-pp-palette-white p-6 text-sm text-pp-palette-black/55">${i18n.t("app.no-icons")}</p>`;
         return;
     }
 
     grid.innerHTML = results.map(({ file, type, icon, filled, monochrome }) => {
         const source = `/assets/icons/${encodeURIComponent(file)}`;
         return `
-            <article class="bg-white px-3 pb-6 mb-4">
-                <span class="flex items-center justify-center ${monochrome ? "bg-black" : "bg-secondary-50"} p-10 rounded-2xl" style="aspect-ratio:1 / 1">
+            <article class="bg-pp-palette-white px-3 pb-6 mb-4">
+                <span class="flex items-center justify-center ${monochrome ? "bg-pp-palette-black" : "bg-pp-palette-secondary-50"} p-10 rounded-2xl" style="aspect-ratio:1 / 1">
                     <img class="block h-full w-full cursor-pointer object-contain" src="${source}" alt="${icon}" title="${i18n.t("app.copy-name", { icon })}" data-icon-name="${icon}" role="button" tabindex="0" loading="lazy" />
                 </span>
-                <p class="mt-4 break-words font-mono text-sm text-black/60">${icon}</p>
-                <p class="mt-2 text-xs tracking-wide text-black/50">${type} · ${filled ? "filled" : "outline"} · ${monochrome ? "monochrome" : "color"}</p>
+                <p class="mt-4 break-words font-mono text-sm text-pp-palette-black/60">${icon}</p>
+                <p class="mt-2 text-xs tracking-wide text-pp-palette-black/50">${type} · ${filled ? "filled" : "outline"} · ${monochrome ? "monochrome" : "color"}</p>
             </article>
         `;
     }).join("");
@@ -513,7 +713,7 @@ async function loadFigmaIcons() {
         initializeFigmaIconCatalog();
     } catch (error) {
         const grid = document.querySelector("#figma-icon-grid");
-        if (grid) grid.innerHTML = `<p class="col-span-full bg-white p-6 text-sm text-red-700">${error.message}</p>`;
+        if (grid) grid.innerHTML = `<p class="col-span-full bg-pp-palette-white p-6 text-sm text-pp-palette-red-700">${error.message}</p>`;
     }
 }
 
@@ -521,12 +721,12 @@ function updateActiveNavigation() {
     const page = document.body.dataset.page ?? "colors";
     document.querySelectorAll("[data-nav]").forEach((link) => {
         const isActive = link.dataset.nav === page;
-        link.classList.toggle("border-primary-500", isActive);
-        link.classList.toggle("bg-primary-25", isActive);
+        link.classList.toggle("border-pp-palette-primary-500", isActive);
+        link.classList.toggle("bg-pp-palette-primary-25", isActive);
         link.classList.toggle("font-medium", isActive);
-        link.classList.toggle("text-primary-800", isActive);
+        link.classList.toggle("text-pp-palette-primary-800", isActive);
         link.classList.toggle("border-transparent", !isActive);
-        link.classList.toggle("text-black/55", !isActive);
+        link.classList.toggle("text-pp-palette-black/55", !isActive);
         if (isActive) {
             link.setAttribute("aria-current", "page");
         } else {
@@ -552,7 +752,7 @@ async function loadTokens() {
         const resultLabel = document.querySelector("#result-label");
         const groupsContainer = document.querySelector("#color-groups");
         if (resultLabel) resultLabel.textContent = i18n.t("app.tokens-failed");
-        if (groupsContainer) groupsContainer.innerHTML = `<p class="text-sm text-red-700">${error.message}</p>`;
+        if (groupsContainer) groupsContainer.innerHTML = `<p class="text-sm text-pp-palette-red-700">${error.message}</p>`;
     }
 }
 
@@ -566,7 +766,7 @@ async function loadUpdates() {
         updatesData = await response.json();
         renderUpdates();
     } catch (error) {
-        updatesList.innerHTML = `<p class="border-t border-black/15 py-8 text-sm text-red-700">${error.message}</p>`;
+        updatesList.innerHTML = `<p class="border-t border-pp-palette-black/15 py-8 text-sm text-pp-palette-red-700">${error.message}</p>`;
     }
 }
 
@@ -592,17 +792,17 @@ function renderUpdates() {
             const dateLabel = new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(createdDate);
             const timeLabel = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(createdDate);
             return `
-            <article class="grid gap-5 border-t border-black/15 py-8 lg:grid-cols-[10rem_minmax(0,1fr)_10rem] lg:gap-8">
-                <time class="font-mono text-xs text-black/50" datetime="${timestamp}">${dateLabel} · ${timeLabel}</time>
+            <article class="grid gap-5 border-t border-pp-palette-black/15 py-8 lg:grid-cols-[10rem_minmax(0,1fr)_10rem] lg:gap-8">
+                <time class="font-mono text-xs text-pp-palette-black/50" datetime="${timestamp}">${dateLabel} · ${timeLabel}</time>
                 <div>
-                    <p class="text-xs font-medium uppercase tracking-widest text-primary-500">${type}</p>
-                    <h2 class="mt-3 text-2xl font-medium tracking-tight text-black">${title}</h2>
-                    <p class="mt-3 max-w-160 text-base leading-7 text-black/60">${description}</p>
+                    <p class="text-xs font-medium uppercase tracking-widest text-pp-palette-primary-500">${type}</p>
+                    <h2 class="mt-3 text-2xl font-medium tracking-tight text-pp-palette-black">${title}</h2>
+                    <p class="mt-3 max-w-160 text-base leading-7 text-pp-palette-black/60">${description}</p>
                     <div class="mt-5 flex flex-wrap gap-2">
-                        ${tags.map((tag) => `<span class="border border-black/15 px-2 py-1 font-mono text-[11px] text-black/55">${tag}</span>`).join("")}
+                        ${tags.map((tag) => `<span class="border border-pp-palette-black/15 px-2 py-1 font-mono text-[11px] text-pp-palette-black/55">${tag}</span>`).join("")}
                     </div>
                 </div>
-                ${href ? `<a class="self-start text-right text-sm font-medium text-black underline decoration-black/25 underline-offset-4 hover:decoration-black" href="${href}">${i18n.t("app.view-resource")}</a>` : ""}
+                ${href ? `<a class="self-start text-right text-sm font-medium text-pp-palette-black underline decoration-pp-palette-black/25 underline-offset-4 hover:decoration-pp-palette-black" href="${href}">${i18n.t("app.view-resource")}</a>` : ""}
             </article>
             `;
         }).join("");
@@ -692,9 +892,13 @@ const hidePageLoader = showPageLoader();
 setTimeout(hidePageLoader, 10000);
 
 document.addEventListener("lumen:languagechange", () => {
-    updateColorTabs();
     updateColorModes();
-    if (document.querySelector("#color-tabs")) render(document.querySelector("#color-search")?.value ?? "");
+    if (document.querySelector("#color-groups")) render(document.querySelector("#color-search")?.value ?? "");
+    if (document.querySelector("#token-rows")) {
+        renderTokenTabs();
+        renderTokenModes();
+        renderTokenTable(document.querySelector("#token-search")?.value ?? "");
+    }
     if (figmaIcons.length) renderFigmaIconCatalog(document.querySelector("#icon-search")?.value ?? "");
     renderButtonCatalog();
     renderUpdates();
@@ -708,10 +912,11 @@ i18n.ready
         i18n.apply();
         updateActiveNavigation();
         initializeColorCatalog();
+        initializeTokenCatalog();
         initializeTypographySpecimens();
         document.querySelector("#button-search")?.addEventListener("input", renderButtonCatalog);
         renderButtonCatalog();
-        await Promise.allSettled([loadFigmaIcons(), loadTokens(), loadUpdates()]);
+        await Promise.allSettled([loadFigmaIcons(), loadTokens(), loadTokenCatalog(), loadUpdates()]);
     })
     .finally(hidePageLoader);
 }

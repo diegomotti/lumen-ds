@@ -1,10 +1,8 @@
-import { createReadStream, existsSync, readdirSync, statSync, watch } from "node:fs";
+import { createReadStream, existsSync, statSync, watch } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
+import { colorsFile, iconCatalog, publicDirectory, tokenCatalog, tokensFile } from "./catalog.js";
 
-const publicDirectory = join(process.cwd(), "public");
-const colorsFile = join(process.cwd(), "resources", "colors.json");
-const iconsDirectory = join(publicDirectory, "assets", "icons");
 const liveReloadClients = new Set();
 const mimeTypes = {
     ".css": "text/css; charset=utf-8",
@@ -13,24 +11,6 @@ const mimeTypes = {
     ".json": "application/json; charset=utf-8",
     ".svg": "image/svg+xml",
 };
-
-function iconCatalog() {
-    return readdirSync(iconsDirectory)
-        .filter((name) => name.endsWith(".svg"))
-        .map((file) => {
-            const match = /^type-(?<type>.+?)--icon-(?<icon>.+?)--filled-(?<filled>true|false)--monochrome-(?<monochrome>true|false)\.svg$/.exec(file);
-            if (!match) return null;
-            return {
-                file,
-                type: match.groups.type,
-                icon: match.groups.icon,
-                filled: match.groups.filled === "true",
-                monochrome: match.groups.monochrome === "true",
-            };
-        })
-        .filter(Boolean)
-        .sort((left, right) => `${left.type}-${left.icon}-${left.file}`.localeCompare(`${right.type}-${right.icon}-${right.file}`));
-}
 
 function notifyLiveReload() {
     for (const client of liveReloadClients) {
@@ -48,6 +28,7 @@ function watchForChanges(target, options) {
 
 watchForChanges(publicDirectory, { recursive: true });
 watchForChanges(colorsFile);
+watchForChanges(tokensFile);
 
 const server = createServer((request, response) => {
     const requestPath = request.url === "/" ? "/index.html" : request.url.split("?")[0];
@@ -69,6 +50,12 @@ const server = createServer((request, response) => {
         return;
     }
 
+    if (requestPath === "/tokens.json") {
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+        response.end(JSON.stringify(tokenCatalog()));
+        return;
+    }
+
     const filePath = requestPath === "/colors.json"
         ? colorsFile
         : normalize(join(publicDirectory, requestPath));
@@ -83,6 +70,7 @@ const server = createServer((request, response) => {
     createReadStream(filePath).pipe(response);
 });
 
-server.listen(3000, () => {
-    console.log("Lumen DS is running at http://localhost:3000");
+const port = Number(process.env.PORT) || 3000;
+server.listen(port, () => {
+    console.log(`Lumen DS is running at http://localhost:${port}`);
 });

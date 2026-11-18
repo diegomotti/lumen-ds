@@ -19,24 +19,24 @@
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/styles.css" />
     </head>
-    <body class="bg-white antialiased" data-page="colors">
-        <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-3" href="#conteudo" data-i18n="common.pular-para-o-conteudo">Pular para o conteudo</a>
+    <body class="bg-pp-palette-white antialiased" data-page="colors">
+        <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-pp-palette-white focus:px-4 focus:py-3" href="#conteudo" data-i18n="common.pular-para-o-conteudo">Pular para o conteudo</a>
 
         <div data-component="header"></div>
 
         <div class="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
             <div data-component="sidebar"></div>
 
-            <main id="conteudo" class="min-w-0 bg-white">
-                <section id="title" class="border-b border-black/15 bg-secondary-50">
+            <main id="conteudo" class="min-w-0 bg-pp-palette-white">
+                <section id="title" class="border-b border-pp-palette-black/15 bg-pp-palette-secondary-50">
                     <div class="flex max-w-360 mx-auto py-15 px-5 lg:px-6">
                         <div class="w-1/2">
-                            <p class="text-xs font-medium tracking-widest text-black/50" data-i18n="common.lumen-ds-recursos">LUMEN DS / RECURSOS</p>
-                            <h1 class="text-8xl font-medium text-black tracking-tighter" data-i18n="common.cores">Cores</h1>
+                            <p class="text-xs font-medium tracking-widest text-pp-palette-black/50" data-i18n="common.lumen-ds-recursos">LUMEN DS / RECURSOS</p>
+                            <h1 class="text-8xl font-medium text-pp-palette-black tracking-tighter" data-i18n="common.cores">Cores</h1>
                         </div>
                         <div class="w-1/2 flex justify-end items-center">
-                            <div class="flex bg-white/85 border border-black/15 focus-within:border-black focus-within:bg-white transition duration-500 rounded-xl px-4 py-4 md:w-95 items-center">
-                                <input class="min-w-0 flex-1 bg-transparent px-3 text-sm text-black outline-none placeholder:text-black/50" id="color-search" type="search" placeholder="Buscar token" autocomplete="on" data-i18n-attr="placeholder:colors.buscar-token" />
+                            <div class="flex bg-pp-palette-white/85 border border-pp-palette-black/15 focus-within:border-pp-palette-black focus-within:bg-pp-palette-white transition duration-500 rounded-xl px-4 py-4 md:w-95 items-center">
+                                <input class="min-w-0 flex-1 bg-transparent px-3 text-sm text-pp-palette-black outline-none placeholder:text-pp-palette-black/50" id="color-search" type="search" placeholder="Buscar token" autocomplete="on" data-i18n-attr="placeholder:colors.buscar-token" />
                                 <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
                             </div>
                         </div>
@@ -45,32 +45,17 @@
 
                 <section class="mx-auto max-w-360 px-5 py-16 lg:px-10" id="cores">
                     <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
-                        <div class="flex gap-2 overflow-x-auto border-b border-black/15 pb-4" id="color-tabs" role="tablist" aria-label="Categorias de variaveis" data-i18n-attr="aria-label:colors.category-tabs">
-                            <button class="shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition border-primary-500 bg-primary-25 text-primary-800" id="color-tab-palette" type="button" role="tab" aria-controls="color-groups" aria-selected="true" tabindex="0" data-color-category="Palette" data-i18n="colors.palette">Paleta</button>
-                            <button class="shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition border-black/15 bg-white text-black/55 hover:border-black hover:text-black" id="color-tab-web-elements" type="button" role="tab" aria-controls="color-groups" aria-selected="false" tabindex="-1" data-color-category="Web Elements" data-i18n="colors.web-elements">Elementos Web</button>
-                            <button class="shrink-0 rounded-xl border px-4 py-2 text-xs font-medium transition border-black/15 bg-white text-black/55 hover:border-black hover:text-black" id="color-tab-web-components" type="button" role="tab" aria-controls="color-groups" aria-selected="false" tabindex="-1" data-color-category="Web Components" data-i18n="colors.web-components">Componentes Web</button>
-                        </div>
                         <div class="hidden shrink-0 gap-2" id="color-modes" role="group" aria-label="Tema de cores" data-i18n-attr="aria-label:colors.modes"></div>
                     </div>
-                    <p class="mb-8 text-sm text-black/55" id="result-label" aria-live="polite"></p>
-                    <div class="grid gap-16" id="color-groups" role="tabpanel" aria-labelledby="color-tab-palette" tabindex="0" aria-live="polite"></div>
-                </section>
-
-                <section class="border-t border-black/15 bg-white" id="em-breve">
-                    <div class="mx-auto grid max-w-360 gap-8 px-5 py-16 lg:grid-cols-[1fr_2fr] lg:px-10 lg:py-22">
-                        <p class="text-xs font-medium tracking-widest text-black/50" data-i18n="colors.proximamente">PROXIMAMENTE</p>
-                        <div>
-                            <h2 class="max-w-150 text-3xl font-medium leading-tight tracking-[-0.025em] sm:text-4xl" data-i18n="colors.a-mesma-base-vai">A mesma base vai receber tipografia, espacamento, componentes e orientacoes de uso.</h2>
-                            <p class="mt-6 max-w-125 text-base leading-7 text-black/60" data-i18n="colors.o-lumen-ds-sera">O Lumen DS sera documentado como um sistema vivo: simples de consultar, consistente para implementar.</p>
-                        </div>
-                    </div>
+                    <p class="mb-8 text-sm text-pp-palette-black/55" id="result-label" aria-live="polite"></p>
+                    <div class="grid gap-16" id="color-groups" aria-live="polite"></div>
                 </section>
             </main>
         </div>
 
         <div data-component="footer"></div>
 
-        <div class="fixed bottom-6 right-6 hidden bg-[#121820] px-4 py-3 text-sm text-white shadow-xl" id="toast" role="status" aria-live="polite"></div>
+        <div class="fixed bottom-6 right-6 hidden bg-[#121820] px-4 py-3 text-sm text-pp-palette-white shadow-xl" id="toast" role="status" aria-live="polite"></div>
         <script src="/i18n.js"></script>
         <script src="/app.js"></script>
     </body>

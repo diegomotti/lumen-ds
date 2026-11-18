@@ -23,6 +23,25 @@
     "colors.modes": "Tema de cores",
     "colors.mode-light": "Claro",
     "colors.mode-dark": "Escuro",
+    "tokens.lumen-ds-tokens": "Lumen DS | Tokens",
+    "tokens.lumen-ds-documentacao-de": "Lumen DS - documentacao de tokens.",
+    "common.tokens": "Tokens",
+    "tokens.buscar-token": "Buscar token",
+    "tokens.todos": "Todos",
+    "tokens.colecoes": "Coleções de tokens",
+    "tokens.tema": "Tema dos tokens",
+    "tokens.claro": "Claro",
+    "tokens.escuro": "Escuro",
+    "tokens.tabela": "Variáveis de token disponíveis no design system",
+    "tokens.previa": "Prévia",
+    "tokens.variavel": "Variável",
+    "tokens.valor": "Valor",
+    "tokens.valor-resolvido": "Valor resolvido",
+    "tokens.tipo": "Tipo",
+    "tokens.nenhum": "Nenhuma variável encontrada. Tente outro termo.",
+    "tokens.indisponivel": "Arquivo de tokens indisponível",
+    "tokens.copy-variavel": "Copiar nome da variável {name}",
+    "tokens.copy-valor": "Copiar valor de {name}: {value}",
     "typography.buscar-fonte": "Buscar fonte",
     "buttons.buscar-botao": "Buscar botão",
     "typography.lumen-ds-tipografia": "Lumen DS | Tipografia",
@@ -124,6 +143,8 @@
     "app.tokens-failed": "Falha ao carregar tokens",
     "app.tokens-found.one": "{count} token encontrado",
     "app.tokens-found.other": "{count} tokens encontrados",
+    "app.variables-found.one": "{count} variável encontrada",
+    "app.variables-found.other": "{count} variáveis encontradas",
     "app.tokens-count.one": "{count} token",
     "app.tokens-count.other": "{count} tokens",
     "app.no-tokens": "Nenhum token encontrado. Tente outro termo.",
@@ -166,5 +187,12 @@
     "updates.items.color-palette-updated.tags": [
         "Cores",
         "Tokens"
+    ],
+    "updates.items.token-catalog-published.type": "Novo conteúdo",
+    "updates.items.token-catalog-published.title": "Página de tokens publicada",
+    "updates.items.token-catalog-published.description": "Todas as variáveis do design system agora estão reunidas em uma tabela consultável, com busca, filtro por coleção, alternância de tema e cópia de nomes e valores.",
+    "updates.items.token-catalog-published.tags": [
+        "Tokens",
+        "Fundações"
     ]
 }
