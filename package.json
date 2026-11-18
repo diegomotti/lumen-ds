@@ -8,7 +8,7 @@
         "watch:css": "npx tailwindcss -i ./src/input.css -o ./public/styles.css --minify --watch",
         "build": "npm run build:css && node build.js",
         "start": "node server.js",
-        "dev": "concurrently --kill-others-on-fail \"npm: start\" \"npm: watch:css\""
+        "dev": "concurrently --kill-others-on-fail \"npm:start\" \"npm:watch:css\""
     },
     "devDependencies": {
         "@tailwindcss/cli": "latest",

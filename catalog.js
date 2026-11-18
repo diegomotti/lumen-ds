@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 export const publicDirectory = join(process.cwd(), "public");
-export const colorsFile = join(process.cwd(), "resources", "colors.json");
+export const colorsFile = join(process.cwd(), "resources", "tokens.json");
 export const tokensFile = join(process.cwd(), "src", "tokens.css");
 const iconsDirectory = join(publicDirectory, "assets", "icons");
 
