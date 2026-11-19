@@ -4,7 +4,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "tokens": "node scripts/build-tokens.mjs",
+        "tokens": "node scripts/sync-tokens.mjs",
+        "sync:tokens": "node scripts/sync-tokens.mjs",
         "build:css": "npx tailwindcss -i ./src/input.css -o ./public/styles.css --minify",
         "watch:css": "npx tailwindcss -i ./src/input.css -o ./public/styles.css --minify --watch",
         "build": "npm run tokens && npm run build:css && node build.js",

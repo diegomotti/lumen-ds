@@ -1,77 +1,102 @@
 <!doctype html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Lumen DS - documentacao de tokens." data-i18n-attr="content:tokens.lumen-ds-documentacao-de" />
-        <title data-i18n="tokens.lumen-ds-tokens">Lumen DS | Tokens</title>
-        <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Lumen DS" />
-        <meta property="og:title" content="Lumen Design System" />
-        <meta property="og:description" content="Lumen DS - documentação do design system." />
-        <meta property="og:image" content="/favicon.png" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:image" content="/favicon.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="/styles.css" />
-    </head>
-    <body class="bg-pp-palette-white antialiased" data-page="tokens">
-        <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-pp-palette-white focus:px-4 focus:py-3" href="#conteudo" data-i18n="common.pular-para-o-conteudo">Pular para o conteudo</a>
 
-        <div data-component="header"></div>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Lumen DS - documentacao de tokens."
+        data-i18n-attr="content:tokens.lumen-ds-documentacao-de" />
+    <title data-i18n="tokens.lumen-ds-tokens">Lumen DS | Tokens</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lumen DS" />
+    <meta property="og:title" content="Lumen Design System" />
+    <meta property="og:description" content="Lumen DS - documentação do design system." />
+    <meta property="og:image" content="/favicon.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Libre+Bodoni:ital,wght@0,400..700;1,400..700&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+</head>
 
-        <div class="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
-            <div data-component="sidebar"></div>
+<body class="bg-pp-palette-white antialiased" data-page="tokens">
+    <a class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-pp-palette-white focus:px-4 focus:py-3"
+        href="#conteudo" data-i18n="common.pular-para-o-conteudo">Pular para o conteudo</a>
 
-            <main id="conteudo" class="min-w-0 bg-pp-palette-white">
-                <section id="title" class="border-b border-pp-palette-black/15 bg-pp-palette-secondary-50">
-                    <div class="flex max-w-360 mx-auto py-15 px-5 lg:px-6">
-                        <div class="w-1/2">
-                            <p class="text-xs font-medium tracking-widest text-pp-palette-black/50" data-i18n="common.lumen-ds-recursos">LUMEN DS / RECURSOS</p>
-                            <h1 class="text-8xl font-medium text-pp-palette-black tracking-tighter" data-i18n="common.tokens">Tokens</h1>
+    <div data-component="header"></div>
+
+    <div class="lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
+        <div data-component="sidebar"></div>
+
+        <main id="conteudo" class="min-w-0 bg-pp-palette-white">
+            <section id="title" class="border-b border-pp-palette-black/15 bg-pp-palette-secondary-50">
+                <div class="flex max-w-360 mx-auto py-15 px-5 lg:px-6">
+                    <div class="w-1/2">
+                        <p class="text-xs font-medium tracking-widest text-pp-palette-black/50"
+                            data-i18n="common.lumen-ds-recursos">LUMEN DS / RECURSOS</p>
+                        <h1 class="text-8xl font-medium text-pp-palette-black tracking-tighter"
+                            data-i18n="common.tokens">Tokens</h1>
+                    </div>
+                    <div class="w-1/2 flex justify-end items-center">
+                        <div
+                            class="flex bg-pp-palette-white/85 border border-pp-palette-black/15 focus-within:border-pp-palette-black focus-within:bg-pp-palette-white transition duration-500 rounded-xl px-4 py-4 md:w-95 items-center">
+                            <input
+                                class="min-w-0 flex-1 bg-transparent px-3 text-sm text-pp-palette-black outline-none placeholder:text-pp-palette-black/50"
+                                id="token-search" type="search" placeholder="Buscar token" autocomplete="on"
+                                data-i18n-attr="placeholder:tokens.buscar-token" />
+                            <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="black"
+                                stroke-width="1.7" aria-hidden="true">
+                                <circle cx="11" cy="11" r="6"></circle>
+                                <path d="m20 20-4.35-4.35"></path>
+                            </svg>
                         </div>
-                        <div class="w-1/2 flex justify-end items-center">
-                            <div class="flex bg-pp-palette-white/85 border border-pp-palette-black/15 focus-within:border-pp-palette-black focus-within:bg-pp-palette-white transition duration-500 rounded-xl px-4 py-4 md:w-95 items-center">
-                                <input class="min-w-0 flex-1 bg-transparent px-3 text-sm text-pp-palette-black outline-none placeholder:text-pp-palette-black/50" id="token-search" type="search" placeholder="Buscar token" autocomplete="on" data-i18n-attr="placeholder:tokens.buscar-token" />
-                                <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
-                            </div>
-                        </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section class="mx-auto max-w-360 px-5 py-16 lg:px-10" id="tokens">
-                    <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
-                        <div class="flex gap-2 overflow-x-auto border-b border-pp-palette-black/15 pb-4" id="token-tabs" role="tablist" aria-label="Coleções de tokens" data-i18n-attr="aria-label:tokens.colecoes"></div>
-                        <div class="flex shrink-0 gap-2" id="token-modes" role="group" aria-label="Tema dos tokens" data-i18n-attr="aria-label:tokens.tema"></div>
+            <section class="mx-auto max-w-360 px-5 py-16 lg:px-10" id="tokens">
+                <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex gap-2 overflow-x-auto border-b border-pp-palette-black/15 pb-4" id="token-tabs"
+                        role="tablist" aria-label="Coleções de tokens" data-i18n-attr="aria-label:tokens.colecoes">
                     </div>
-                    <p class="mb-8 text-sm text-pp-palette-black/55" id="token-result-label" aria-live="polite"></p>
-                    <div class="overflow-x-auto rounded-xl border border-pp-palette-black/15 bg-pp-palette-white">
-                        <table class="w-full min-w-[46rem] text-left text-sm">
-                            <caption class="sr-only" data-i18n="tokens.tabela">Variáveis de token disponíveis no design system</caption>
-                            <thead class="border-b border-pp-palette-black/15 bg-pp-palette-secondary-50 text-[11px] uppercase tracking-widest text-pp-palette-black/45">
-                                <tr>
-                                    <th class="w-16 px-4 py-3 font-medium" scope="col" data-i18n="tokens.previa">Prévia</th>
-                                    <th class="px-4 py-3 font-medium" scope="col" data-i18n="tokens.variavel">Variável</th>
-                                    <th class="px-4 py-3 font-medium" scope="col" data-i18n="tokens.valor">Valor</th>
-                                    <th class="px-4 py-3 font-medium" scope="col" data-i18n="tokens.valor-resolvido">Valor resolvido</th>
-                                    <th class="hidden px-4 py-3 font-medium sm:table-cell" scope="col" data-i18n="tokens.tipo">Tipo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="token-rows" class="divide-y divide-pp-palette-black/10"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </main>
-        </div>
+                    <div class="flex shrink-0 gap-2" id="token-modes" role="group" aria-label="Tema dos tokens"
+                        data-i18n-attr="aria-label:tokens.tema"></div>
+                </div>
+                <p class="mb-8 text-sm text-pp-palette-black/55" id="token-result-label" aria-live="polite"></p>
+                <div class="overflow-x-auto rounded-xl border border-pp-palette-black/15 bg-pp-palette-white">
+                    <table class="w-full min-w-[46rem] text-left text-sm">
+                        <caption class="sr-only" data-i18n="tokens.tabela">Variáveis de token disponíveis no design
+                            system</caption>
+                        <thead
+                            class="border-b border-pp-palette-black/15 bg-pp-palette-secondary-50 text-[11px] uppercase tracking-widest text-pp-palette-black/45">
+                            <tr>
+                                <th class="w-16 px-4 py-3 font-medium" scope="col" data-i18n="tokens.previa">Prévia</th>
+                                <th class="px-4 py-3 font-medium" scope="col" data-i18n="tokens.variavel">Variável</th>
+                                <th class="px-4 py-3 font-medium" scope="col" data-i18n="tokens.valor">Valor</th>
+                                <th class="px-4 py-3 font-medium" scope="col" data-i18n="tokens.valor-resolvido">Valor
+                                    resolvido</th>
+                                <th class="hidden px-4 py-3 font-medium sm:table-cell" scope="col"
+                                    data-i18n="tokens.tipo">Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="token-rows" class="divide-y divide-pp-palette-black/10"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
 
-        <div data-component="footer"></div>
+    <div data-component="footer"></div>
 
-        <div class="fixed bottom-6 right-6 hidden bg-[#121820] px-4 py-3 text-sm text-pp-palette-white shadow-xl" id="toast" role="status" aria-live="polite"></div>
-        <script src="/i18n.js"></script>
-        <script src="/app.js"></script>
-    </body>
+    <div class="fixed bottom-6 right-6 hidden bg-[#121820] px-4 py-3 text-sm text-pp-palette-white shadow-xl" id="toast"
+        role="status" aria-live="polite"></div>
+    <script src="/i18n.js"></script>
+    <script src="/app.js"></script>
+</body>
+
 </html>
