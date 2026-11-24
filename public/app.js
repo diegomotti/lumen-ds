@@ -583,7 +583,7 @@ function renderButtonCatalog() {
                 <div class="flex min-h-40 items-center justify-center border border-pp-palette-black/10 ${type === "outline" ? "bg-pp-palette-black" : "bg-pp-palette-secondary-50"} p-4">
                     <button class="${shapeClasses[shape]} ${styleClasses[color]} ${typeClass} ${iconClass} py-2.5 text-sm font-medium transition focus:outline-2 focus:outline-offset-2 focus:outline-pp-palette-primary-500 ${stateClass}" type="button" ${isDisabled ? "disabled" : ""} aria-label="${label}">${typeLabels[type]}</button>
                 </div>
-                <p class="mt-4 break-words font-mono text-xs text-pp-palette-black/70">${label}</p>
+                <p class="mt-4 wrap-break-word font-mono text-xs text-pp-palette-black/70">${label}</p>
                 <p class="mt-2 text-[11px] uppercase tracking-wide text-pp-palette-black/45">State=${stateLabel}</p>
             </article>
         `;
@@ -655,7 +655,7 @@ function renderFigmaIconCatalog(query = "") {
                 <span class="flex items-center justify-center ${monochrome ? "bg-pp-palette-black" : "bg-pp-palette-secondary-50"} p-10 rounded-2xl" style="aspect-ratio:1 / 1">
                     <img class="block h-full w-full cursor-pointer object-contain" src="${source}" alt="${icon}" title="${i18n.t("app.copy-name", { icon })}" data-icon-name="${icon}" role="button" tabindex="0" loading="lazy" />
                 </span>
-                <p class="mt-4 break-words font-mono text-sm text-pp-palette-black/60">${icon}</p>
+                <p class="mt-4 wrap-break-word font-mono text-sm text-pp-palette-black/60">${icon}</p>
                 <p class="mt-2 text-xs tracking-wide text-pp-palette-black/50">${type} · ${filled ? "filled" : "outline"} · ${monochrome ? "monochrome" : "color"}</p>
             </article>
         `;
